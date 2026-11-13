@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>청평초 단원평가 · 교사</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2a44;--muted:#5b6478;--line:#dde3eb;--ok:#0e7c66;--ok-soft:#dff3ec;--warn:#c2571a;--warn-soft:#fde9dc;--half-soft:#fbf1cf;--sky:#2f6fb0}
@@ -49,7 +50,7 @@ select{font:inherit;padding:5px 8px;border-radius:6px;border:1px solid var(--lin
 <script src="https://accounts.google.com/gsi/client" async onload="window.__gis=1;window.dispatchEvent(new Event('gis-loaded'))"></script>
 <script src="api.js"></script>
 <script>
-let D = null, tab = 'students', conceptFilter = '';
+let D = null, tab = 'students', conceptFilter = '', unitId = decodeURIComponent(location.hash.slice(1)) || '';
 const $ = document.getElementById('app');
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function pct(x){return x==null?'–':Math.round(x*100)+'%';}
@@ -58,7 +59,7 @@ function cname(id){return D.concepts.find(c=>c.id===id).name;}
 
 async function load(){
   $.innerHTML='<p class="muted">불러오는 중…</p>';
-  try{ D = await call('getDashboard'); render(); }catch(e){ $.innerHTML=`<div class="err">${esc(e.message||e)}</div>`; }
+  try{ D = await call('getDashboard', unitId); unitId = D.unit.id; if(location.hash.slice(1)!==unitId) history.replaceState(null,'','#'+unitId); render(); }catch(e){ $.innerHTML=`<div class="err">${esc(e.message||e)}</div>`; }
 }
 
 function render(){
@@ -73,8 +74,12 @@ function render(){
 
   $.innerHTML = `
   <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap">
-    <div><h1>여러 가지 기체 · 학급 현황</h1><p class="lead">완전학습 기준: 개념별 ${pct(D.mastery)} 이상</p></div>
-    <div style="display:flex;gap:6px"><button class="btn" onclick="load()">새로고침</button><button class="btn" onclick="signOut()">로그아웃</button></div>
+    <div><label class="muted" for="unitSel">단원</label>
+      <select id="unitSel" onchange="unitId=this.value;conceptFilter='';history.replaceState(null,'','#'+unitId);load()" style="display:block;font-size:16px;margin:2px 0 6px">
+        ${D.units.map(u=>`<option value="${esc(u.id)}" ${u.id===D.unit.id?'selected':''}>${esc(u.subject)} ${esc(u.term)} · ${esc(u.no)}. ${esc(u.title)}</option>`).join('')}
+      </select>
+      <h1>${esc(D.unit.title)} · 학급 현황</h1><p class="lead">완전학습 기준: 개념별 ${pct(D.mastery)} 이상</p></div>
+    <div style="display:flex;gap:6px"><button class="btn" onclick="load()">새로고침</button><a class="btn" href="index.html" style="text-decoration:none">학생 화면</a><button class="btn" onclick="signOut()">로그아웃</button></div>
   </div>
   <div class="card summary">
     <div><span class="muted">응시한 학생</span><b>${n}명</b></div>
