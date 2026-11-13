@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef4fa; --card:#ffffff; --ink:#1f2a44; --muted:#5b6478; --line:#d3deea;
+  --sky:#2f6fb0; --sky-soft:#dceaf8; --ok:#0e7c66; --ok-soft:#dff3ec; --warn:#c2571a; --warn-soft:#fde9dc; --half:#a07a00; --half-soft:#fbf1cf;
+  --head:"Jua","Gowun Dodum",sans-serif; --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.7;word-break:keep-all}
+main{max-width:720px;margin:0 auto;padding:20px 16px 80px}
+h1,h2,h3{font-family:var(--head);font-weight:400;line-height:1.3}
+h1{font-size:32px;margin:8px 0 4px}
+h2{font-size:24px;margin:0 0 10px}
+.card{background:var(--card);border-radius:14px;padding:22px 22px;margin:14px 0;box-shadow:0 1px 0 var(--line)}
+.muted{color:var(--muted);font-size:16px}
+button{font-family:var(--head);font-size:20px;border:none;border-radius:12px;padding:12px 22px;cursor:pointer;background:var(--sky);color:#fff}
+button.ghost{background:transparent;color:var(--sky);border:2px solid var(--sky)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,label:focus-within{outline:3px solid #f2b705;outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+
+/* 개념 지도 */
+.concepts{display:grid;gap:10px;margin-top:12px}
+.concept{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--bg)}
+.balloon{width:34px;height:42px;flex:none}
+.concept b{font-family:var(--head);font-weight:400;font-size:19px}
+.concept .st{margin-left:auto;font-size:15px;white-space:nowrap}
+.st.ok{color:var(--ok)} .st.need{color:var(--warn)} .st.none{color:var(--muted)}
+.meter{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px;width:100%}
+.meter i{display:block;height:100%;background:var(--sky)}
+
+/* 문항 */
+.progress{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--sky);transition:width .25s}
+.qhead{display:flex;justify-content:space-between;font-size:15px;color:var(--muted);margin:8px 0}
+.prompt{font-size:20px;margin:0 0 14px}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:2px solid var(--line);border-radius:12px;margin:8px 0;cursor:pointer;background:var(--card)}
+.opt input{margin-top:7px;width:20px;height:20px;flex:none}
+.opt:has(input:checked){border-color:var(--sky);background:var(--sky-soft)}
+.mrow{padding:10px 0;border-top:1px solid var(--line)}
+.mrow:first-child{border-top:none}
+.mrow p{margin:0 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-size:16px;background:var(--card);color:var(--ink);font-family:var(--body)}
+.chip[aria-pressed="true"]{border-color:var(--sky);background:var(--sky);color:#fff}
+select{font:inherit;font-size:17px;padding:8px;border-radius:10px;border:2px solid var(--line);width:100%;background:var(--card);color:var(--ink)}
+textarea{width:100%;min-height:150px;font:inherit;padding:12px;border-radius:12px;border:2px solid var(--line);resize:vertical}
+textarea:focus{border-color:var(--sky);outline:none}
+table{border-collapse:collapse;margin:8px 0 14px;font-size:16px}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--bg)}
+ul.facts{margin:4px 0 12px;padding-left:1.2em}
+
+/* 결과 */
+.res{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.res:first-of-type{border-top:none}
+.mark{font-family:var(--head);font-size:15px;border-radius:8px;padding:2px 10px;height:fit-content;white-space:nowrap}
+.mark.o{background:var(--ok-soft);color:var(--ok)} .mark.x{background:var(--warn-soft);color:var(--warn)} .mark.h{background:var(--half-soft);color:var(--half)}
+.res p{margin:0}
+.res .your{color:var(--muted);font-size:15px}
+.res .exp{font-size:16px;margin-top:4px}
+.review h3{font-size:22px;margin:0 0 6px}
+.core{font-size:19px;background:var(--sky-soft);padding:10px 14px;border-radius:10px}
+.wrongbox{background:var(--warn-soft);padding:10px 14px;border-radius:10px;margin-top:8px}
+.wrongbox p{margin:4px 0;font-size:16px}
+.check{display:flex;gap:10px;align-items:center;margin-top:12px;font-family:var(--head);font-size:19px}
+.check input{width:22px;height:22px}
+.err{background:var(--warn-soft);color:var(--warn);padding:14px;border-radius:12px}
+.celebrate{text-align:center}
+.celebrate svg{width:140px;height:160px}
+@media (prefers-reduced-motion:reduce){.progress i{transition:none}}
+</style>
+</head>
+<body>
+<main id="app"><p class="muted">불러오는 중…</p></main>
+
+<script src="config.js"></script>
+<script src="https://accounts.google.com/gsi/client" async onload="window.__gis=1;window.dispatchEvent(new Event('gis-loaded'))"></script>
+<script src="api.js"></script>
+<script>
+const CIRC = ['①','②','③','④','⑤','⑥'];
+const COLORS = {W:'#6c8ebf',T:'#e07a5f',P:'#3d9970',G:'#9b6ad1',A:'#e0a800'};
+let state = { home:null, test:null, idx:0, answers:{}, result:null };
+
+const $app = document.getElementById('app');
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function call(fn, ...args){ return api(fn, ...args); }
+function fail(e){ $app.innerHTML = `<div class="err">${esc(e && e.message || e)}</div>`; }
+function pct(x){ return Math.round((x||0)*100); }
+function balloon(color, filled){
+  return `<svg class="balloon" viewBox="0 0 34 42" aria-hidden="true">
+    <ellipse cx="17" cy="15" rx="${filled?13:9}" ry="${filled?14:10}" fill="${filled?color:'none'}" stroke="${color}" stroke-width="2"/>
+    <path d="M17 ${filled?29:25} l-2 3 h4 z" fill="${color}"/><path d="M17 ${filled?32:28} q-3 5 0 10" stroke="${color}" fill="none" stroke-width="1.5"/></svg>`;
+}
+
+// ── 홈 ──
+async function loadHome(){
+  try{ state.home = await call('getHome'); renderHome(); }catch(e){ fail(e); }
+}
+function conceptList(h){
+  return `<div class="concepts">${h.concepts.map(c=>{
+    const st = c.score==null ? '<span class="st none">아직 안 풀었어요</span>'
+      : c.mastered ? `<span class="st ok">완전학습 ${pct(c.score)}%</span>` : `<span class="st need">보충 필요 ${pct(c.score)}%</span>`;
+    return `<div class="concept">${balloon(COLORS[c.id], c.mastered)}<div style="flex:1"><b>${esc(c.name)}</b>
+      ${c.score!=null?`<div class="meter"><i style="width:${pct(c.score)}%;background:${COLORS[c.id]}"></i></div>`:''}</div>${st}</div>`;
+  }).join('')}</div>`;
+}
+function renderHome(){
+  const h = state.home;
+  const who = h.name ? `${esc(h.name)} 학생` : esc(h.email);
+  let action;
+  if (!h.mainDone) action = `<p>모두 19문제예요. 다섯 가지 개념마다 ${pct(h.threshold)}% 이상 맞히면 풍선이 가득 부풀어요.</p><button onclick="startTest()">평가 시작하기</button>`;
+  else if (h.allMastered) action = `<p>다섯 개념 모두 완전학습을 이루었어요. 정말 잘했어요!</p>`;
+  else action = `<p>아직 부풀지 않은 풍선이 있어요. 보충 학습을 읽고 다시 도전해 보세요.</p><button onclick="openReview()">보충 학습 하러 가기</button>`;
+  $app.innerHTML = `
+    <h1>여러 가지 기체</h1><p class="muted">4학년 2학기 과학 3단원 · ${who}</p>
+    <div class="card"><h2>나의 풍선 다섯 개</h2>${conceptList(h)}</div>
+    <div class="card">${action}</div>
+    <p class="muted" style="text-align:center">${esc(h.email)} · <button class="ghost" style="font-size:15px;padding:4px 12px" onclick="signOut()">다른 계정으로 로그인</button></p>`;
+}
+
+// ── 시험 ──
+async function startTest(){
+  $app.innerHTML = '<p class="muted">문제를 준비하고 있어요…</p>';
+  try{
+    state.test = await call('getTest');
+    if (state.test.mode === '완료'){ return loadHome(); }
+    state.idx = 0; state.answers = {};
+    renderItem();
+  }catch(e){ fail(e); }
+}
+function answered(q){
+  const a = state.answers[q.id];
+  if (q.type==='match') return Array.isArray(a) && a.length===q.rows.length && a.every(v=>v!==undefined && v!=='');
+  if (q.type==='text') return a && a.trim().length>0;
+  return a!==undefined;
+}
+function renderItem(){
+  const t = state.test, q = t.items[state.idx], n = t.items.length;
+  const cname = t.concepts.find(c=>c.id===q.c).name;
+  let body = '';
+  if (q.list) body += `<ul class="facts">${q.list.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+  if (q.table) body += `<table><tr>${q.table.head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr>${q.table.rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table>`;
+  const a = state.answers[q.id];
+  if (q.type==='mc'){
+    body += q.options.map((o,i)=>`<label class="opt"><input type="radio" name="mc" value="${i}" ${a===i?'checked':''} onchange="setAns(${i})"><span>${CIRC[i]} ${esc(o)}</span></label>`).join('');
+  } else if (q.type==='match'){
+    const cur = Array.isArray(a)?a:[];
+    const useChips = q.choices.length<=3;
+    body += q.rows.map((r,ri)=>`<div class="mrow"><p>${esc(r)}</p>${useChips
+      ? `<div class="chips">${q.choices.map((c,ci)=>`<button type="button" class="chip" aria-pressed="${cur[ri]===ci}" onclick="setMatch(${ri},${ci})">${esc(c)}</button>`).join('')}</div>`
+      : `<select onchange="setMatch(${ri}, this.value===''?'':Number(this.value))"><option value="">고르세요</option>${q.choices.map((c,ci)=>`<option value="${ci}" ${cur[ri]===ci?'selected':''}>${esc(c)}</option>`).join('')}</select>`
+    }</div>`).join('');
+  } else {
+    body += `<textarea placeholder="여기에 써 보세요. 무엇이 변했는지, 그래서 기체의 부피나 무게가 어떻게 되었는지 쓰면 좋아요." oninput="state.answers['${q.id}']=this.value">${esc(a||'')}</textarea>`;
+  }
+  const last = state.idx===n-1;
+  $app.innerHTML = `
+    <div class="progress" aria-hidden="true"><i style="width:${(state.idx+1)/n*100}%"></i></div>
+    <div class="qhead"><span>${t.mode} · ${esc(cname)}</span><span>${state.idx+1} / ${n}</span></div>
+    <div class="card"><p class="prompt"><b>${state.idx+1}.</b> ${esc(q.prompt)}</p>${body}</div>
+    <div class="row">
+      <button class="ghost" onclick="move(-1)" ${state.idx===0?'disabled':''}>이전</button>
+      <span class="spacer"></span>
+      ${last?'<button onclick="finish()">제출하기</button>':'<button onclick="move(1)">다음</button>'}
+    </div>`;
+}
+function setAns(v){ state.answers[state.test.items[state.idx].id]=v; }
+function setMatch(ri, ci){
+  const q = state.test.items[state.idx];
+  const arr = Array.isArray(state.answers[q.id]) ? state.answers[q.id] : new Array(q.rows.length);
+  arr[ri] = ci; state.answers[q.id] = arr;
+  if (q.choices.length<=3) renderItem();
+}
+function move(d){ state.idx = Math.max(0, Math.min(state.test.items.length-1, state.idx+d)); renderItem(); window.scrollTo(0,0); }
+async function finish(){
+  const left = state.test.items.map((q,i)=>answered(q)?null:i+1).filter(Boolean);
+  if (left.length && !confirm(`아직 답하지 않은 문제가 있어요: ${left.join(', ')}번\n그래도 제출할까요?`)) return;
+  $app.innerHTML = '<p class="muted">채점하고 있어요…</p>';
+  try{
+    state.result = await call('submitTest', state.answers);
+    state.home = state.result.home;
+    renderResult();
+  }catch(e){ fail(e); }
+}
+
+// ── 결과 ──
+function markOf(s){ return s>=1?'<span class="mark o">맞음</span>':s>0?'<span class="mark h">절반</span>':'<span class="mark x">다시 보기</span>'; }
+function renderResult(){
+  const r = state.result, h = r.home;
+  if (h.allMastered) return renderDone();
+  const items = r.items.map((it,i)=>`<div class="res">${markOf(it.score)}<div>
+      <p><b>${i+1}.</b> ${esc(it.prompt)}</p>
+      <p class="your">내 답: ${esc(it.your)}</p>
+      <p class="exp">${esc(it.explain)}${it.needsTeacher?' <span class="muted">(서술형은 선생님이 한 번 더 확인해요)</span>':''}</p></div></div>`).join('');
+  $app.innerHTML = `
+    <h1>${r.mode} 결과</h1>
+    <div class="card"><h2>개념별 결과</h2>${conceptList(h)}</div>
+    <div class="card"><button onclick="openReview()">보충 학습 하러 가기</button></div>
+    <div class="card"><h2>문제 다시 보기</h2>${items}</div>`;
+  window.scrollTo(0,0);
+}
+
+// ── 보충 학습 ──
+async function openReview(){
+  $app.innerHTML = '<p class="muted">보충 학습을 준비하고 있어요…</p>';
+  try{
+    const list = await call('getReview');
+    if (!list.length) return loadHome();
+    $app.innerHTML = `<h1>보충 학습</h1><p class="muted">아직 부풀지 않은 풍선의 핵심 내용이에요. 하나씩 읽고 체크하면 다시 도전할 수 있어요.</p>
+      ${list.map(rv=>{
+        const d = rv.data;
+        return `<div class="card review"><div class="row">${balloon(COLORS[rv.id], false)}<h3>${esc(rv.name)}</h3></div>
+          <p class="core">${esc(d.core)}</p>
+          ${d.points?`<ul class="facts">${d.points.map(p=>`<li>${esc(p)}</li>`).join('')}</ul>`:''}
+          ${d.table?`<div style="overflow-x:auto"><table><tr><th>기체</th><th>성질</th><th>쓰임</th></tr>${d.table.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`:''}
+          <div class="wrongbox"><b>이렇게 착각하기 쉬워요</b>${d.wrong.map(w=>`<p>${esc(w)}</p>`).join('')}</div>
+          <label class="check"><input type="checkbox" class="readchk" onchange="checkRead()"> 다 읽고 이해했어요</label></div>`;
+      }).join('')}
+      <div class="row"><button class="ghost" onclick="loadHome()">처음으로</button><span class="spacer"></span><button id="retry" onclick="startTest()" disabled>다시 도전하기</button></div>`;
+    window.scrollTo(0,0);
+  }catch(e){ fail(e); }
+}
+function checkRead(){
+  const all = [...document.querySelectorAll('.readchk')].every(c=>c.checked);
+  document.getElementById('retry').disabled = !all;
+}
+
+// ── 완전학습 ──
+function renderDone(){
+  const h = state.home;
+  $app.innerHTML = `<div class="card celebrate">
+    <svg viewBox="0 0 140 160" aria-hidden="true">${['W','T','P','G','A'].map((k,i)=>{
+      const x=[22,46,70,94,118][i], y=[50,34,26,34,50][i];
+      return `<ellipse cx="${x}" cy="${y}" rx="17" ry="20" fill="${COLORS[k]}"/><path d="M${x} ${y+20} Q${x-6} ${y+60} 70 150" stroke="${COLORS[k]}" fill="none" stroke-width="1.5"/>`;
+    }).join('')}</svg>
+    <h1>완전학습 달성!</h1><p>다섯 개념 모두 ${pct(h.threshold)}% 이상 이해했어요.${h.retries?` 재도전 ${h.retries}번 끝에 해냈어요.`:''}</p></div>
+    <div class="card"><h2>나의 풍선 다섯 개</h2>${conceptList(h)}</div>`;
+  window.scrollTo(0,0);
+}
+
+loadHome();
+</script>
+</body>
+</html>
