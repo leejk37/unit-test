@@ -117,7 +117,7 @@ function items(){
     ${D.concepts.map(c=>`<option value="${c.id}" ${conceptFilter===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
     <span class="muted">평균 점수가 낮은 문항부터 보여 줍니다.</span></div>
   ${list.length?`<div class="wrap"><table><thead><tr><th>문항</th><th>개념</th><th style="width:44%">문제</th><th>응답</th><th>평균</th><th>자주 나온 오답</th></tr></thead><tbody>
-  ${list.map(it=>`<tr><td>${it.id}</td><td>${esc(cname(it.c))}</td><td>${esc(it.prompt)}</td><td>${it.n}</td>
+  ${list.map(it=>`<tr><td>${it.id}</td><td>${esc(cname(it.c))}</td><td>${it.typeName?`<b>${esc(it.typeName)}</b><br>`:''}${esc(it.prompt)}</td><td>${it.n}</td>
     <td class="s ${it.avg>=D.mastery?'ok':'need'}">${pct(it.avg)}</td><td>${it.type==='text'?'<span class="muted">서술형</span>':esc(it.topWrong.join(', '))||'–'}</td></tr>`).join('')}
   </tbody></table></div>`:'<p class="muted">응답이 없습니다.</p>'}`;
 }

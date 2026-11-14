@@ -64,7 +64,7 @@ button:focus-visible,a:focus-visible,label:focus-within{outline:3px solid #f2b70
 .progress{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
 .progress i{display:block;height:100%;background:var(--sky);transition:width .25s}
 .qhead{display:flex;justify-content:space-between;font-size:15px;color:var(--muted);margin:8px 0}
-.prompt{font-size:20px;margin:0 0 14px}
+.prompt{font-size:20px;margin:0 0 14px;white-space:pre-line}
 .opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:2px solid var(--line);border-radius:12px;margin:8px 0;cursor:pointer;background:var(--card)}
 .opt input{margin-top:7px;width:20px;height:20px;flex:none}
 .opt:has(input:checked){border-color:var(--sky);background:var(--sky-soft)}
@@ -87,7 +87,7 @@ ul.facts{margin:4px 0 12px;padding-left:1.2em}
 .res:first-of-type{border-top:none}
 .mark{font-family:var(--head);font-size:15px;border-radius:8px;padding:2px 10px;height:fit-content;white-space:nowrap}
 .mark.o{background:var(--ok-soft);color:var(--ok)} .mark.x{background:var(--warn-soft);color:var(--warn)} .mark.h{background:var(--half-soft);color:var(--half)}
-.res p{margin:0}
+.res p{margin:0;white-space:pre-line}
 .res .your{color:var(--muted);font-size:15px}
 .res .exp{font-size:16px;margin-top:4px}
 .review h3{font-size:22px;margin:0 0 6px}
@@ -264,7 +264,7 @@ async function finish(){
   if (left.length && !confirm(`아직 답하지 않은 문제가 있어요: ${left.join(', ')}번\n그래도 제출할까요?`)) return;
   $app.innerHTML = '<p class="muted">채점하고 있어요…</p>';
   try{
-    state.result = await call('submitTest', state.unitId, state.answers, state.test.items.map(q=>q.id));
+    state.result = await call('submitTest', state.unitId, state.answers, state.test.items.map(q=>q.id), state.test.testId);
     state.home = state.result.home;
     catalog = null; // 목록의 진행 상태를 새로 받도록
     renderResult();
